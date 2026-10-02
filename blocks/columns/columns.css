@@ -288,7 +288,8 @@
   font-weight: 700;
 }
 
-.columns.columns-product .columns-product-price del {
+.columns.columns-product .columns-product-price del,
+.columns.columns-product .columns-product-price s {
   color: var(--text-color-muted);
   font-weight: 500;
 }

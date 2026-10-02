@@ -12,6 +12,7 @@ export default async function decorate(block) {
   const fragment = await loadFragment(footerPath);
 
   block.textContent = '';
+  if (!fragment) return; // footer document not previewed/published yet
   const footer = document.createElement('div');
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
 

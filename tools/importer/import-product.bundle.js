@@ -119,7 +119,7 @@ var CustomImportScript = (() => {
       }
       if (original && original !== sale) {
         if (sale) p.append(document.createTextNode(" "));
-        const del = document.createElement("del");
+        const del = document.createElement("s");
         del.textContent = withWon(original);
         p.append(del);
       }

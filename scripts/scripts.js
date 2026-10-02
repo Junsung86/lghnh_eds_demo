@@ -38,7 +38,8 @@ export function getContentRoot() {
     while (root.length > 0 && ['blog', 'product'].includes(root[root.length - 1])) {
       root.pop();
     }
-    return `/${root.join('/')}`;
+    // site root → '' so callers building `${root}/nav` get '/nav', not '//nav' (protocol-relative)
+    return root.length ? `/${root.join('/')}` : '';
   }
   return '';
 }
