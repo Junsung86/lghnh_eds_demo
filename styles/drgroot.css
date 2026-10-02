@@ -1,0 +1,203 @@
+/* stylelint-disable no-descending-specificity -- consolidated theme file */
+
+/*
+ * Dr.Groot theme — design tokens and default content styles migrated from https://drgroot.co.kr/
+ * Loaded only on pages with "Theme: drgroot" metadata (see THEME_STYLESHEETS in scripts.js),
+ * so the WKND design system stays untouched on all other pages.
+ */
+
+/* Pretendard (OFL) — dynamic subset splits Korean glyphs into small unicode-range files */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&display=swap');
+
+body.drgroot {
+  /* colors */
+  --background-color: #fffef5;
+  --text-color: #333;
+  --text-color-muted: #ababab;
+  --text-color-subtle: #555;
+  --light-color: #eae9e1;
+  --dark-color: #333;
+  --border-color: #d6d5cc;
+  --border-color-light: #d6d5cc;
+  --sale-color: #d60027;
+  --link-color: #333;
+  --link-hover-color: #888;
+
+  /* fonts */
+  --body-font-family: pretendard, malgun gothic, 맑은 고딕, sans-serif;
+  --heading-font-family: pretendard, malgun gothic, 맑은 고딕, sans-serif;
+  --display-font-family: eb garamond, pretendard, serif;
+
+  /* sizes (mobile-first) */
+  --body-font-size-m: 16px;
+  --body-font-size-s: 14px;
+  --body-font-size-xs: 12px;
+  --heading-font-size-xxl: 24px;
+  --heading-font-size-xl: 22px;
+  --heading-font-size-l: 20px;
+  --heading-font-size-m: 18px;
+  --heading-font-size-s: 16px;
+  --heading-font-size-xs: 14px;
+  --display-font-size: 30px;
+
+  /* layout — header: 38px promo strip + 64px bar (80px from 1200px) */
+  --nav-height: 102px;
+  --section-padding: 32px 0;
+  --container-max-width: 1400px;
+  --container-padding: 0 20px;
+
+  /* buttons: square outline */
+  --button-font-family: var(--body-font-family);
+  --button-font-size: 16px;
+  --button-font-weight: 500;
+  --button-letter-spacing: 0;
+  --button-border-radius: 0;
+  --button-padding: 0 30px;
+  --button-height: 56px;
+
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+@media (width >= 900px) {
+  body.drgroot {
+    --body-font-size-m: 16px;
+    --heading-font-size-xxl: 32px;
+    --heading-font-size-xl: 24px;
+    --heading-font-size-l: 24px;
+    --heading-font-size-m: 20px;
+    --heading-font-size-s: 16px;
+    --heading-font-size-xs: 14px;
+    --display-font-size: 40px;
+    --section-padding: 50px 0;
+  }
+}
+
+@media (width >= 1200px) {
+  body.drgroot {
+    --nav-height: 118px;
+  }
+}
+
+/* --- TYPOGRAPHY --- */
+
+body.drgroot h1,
+body.drgroot h2,
+body.drgroot h3,
+body.drgroot h4,
+body.drgroot h5,
+body.drgroot h6 {
+  color: var(--text-color);
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+body.drgroot main .section > div > h2:first-child {
+  margin-bottom: 25px;
+}
+
+body.drgroot p {
+  line-height: 1.5;
+}
+
+/* --- LINKS --- */
+
+body.drgroot a:hover {
+  text-decoration: none;
+}
+
+body.drgroot *:focus-visible {
+  outline-color: var(--text-color);
+}
+
+/* --- BUTTONS: 1px outline, square, no offset shadow --- */
+
+body.drgroot a.button:any-link {
+  min-height: var(--button-height);
+  min-width: 285px;
+  border-width: 1px;
+  line-height: 1;
+  box-shadow: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+/* chevron after the label */
+body.drgroot a.button:any-link::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: 12px;
+  border-top: 1px solid currentcolor;
+  border-right: 1px solid currentcolor;
+  transform: rotate(45deg);
+}
+
+body.drgroot a.button:hover,
+body.drgroot a.button:active {
+  transform: none;
+  box-shadow: none;
+}
+
+body.drgroot a.button.primary,
+body.drgroot a.button.secondary {
+  border-color: var(--text-color);
+  background-color: transparent;
+  color: var(--text-color);
+}
+
+body.drgroot a.button.primary:hover,
+body.drgroot a.button.secondary:hover {
+  background-color: var(--text-color);
+  color: var(--background-color);
+}
+
+/* --- SECTIONS --- */
+
+/* Secondary: warm grey panel with generous padding */
+body.drgroot main > .section.secondary {
+  padding: 48px 0;
+}
+
+@media (width >= 900px) {
+  body.drgroot main > .section.secondary {
+    padding: 100px 0;
+  }
+}
+
+/* Section intro: eyebrow + display heading (e.g. 닥터 그루트 브랜드라인) */
+body.drgroot main > .section.secondary .default-content-wrapper > p:first-child {
+  margin-bottom: 0;
+  font-size: 20px;
+}
+
+body.drgroot main > .section.secondary .default-content-wrapper h2 {
+  margin-bottom: 32px;
+  padding-top: 15px;
+  font-family: var(--display-font-family);
+  font-size: var(--display-font-size);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+@media (width >= 900px) {
+  body.drgroot main > .section.secondary .default-content-wrapper > p:first-child {
+    font-size: 24px;
+  }
+
+  body.drgroot main > .section.secondary .default-content-wrapper h2 {
+    margin-bottom: 50px;
+  }
+}
+
+/* Stacked product detail images: centered, no gaps between slices */
+body.drgroot main .default-content-wrapper > p:has(> picture:only-child) {
+  margin: 0;
+  line-height: 0;
+  text-align: center;
+}
+
+body.drgroot main .default-content-wrapper > p > picture img {
+  display: block;
+  margin: 0 auto;
+}

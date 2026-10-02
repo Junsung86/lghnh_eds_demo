@@ -1,0 +1,132 @@
+/* stylelint-disable no-descending-specificity -- consolidated block file */
+
+/* Product info — highlights chip, summary and +/- accordions */
+
+.product-info-wrapper,
+.columns-product .columns-text-col > .product-info-wrapper {
+  margin-top: 40px;
+}
+
+.product-info {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.product-info .product-info-section + .product-info-section {
+  margin-top: 28px;
+}
+
+.product-info .product-info-heading {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* highlights: icon chip */
+.product-info .product-info-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-info .product-info-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.product-info .product-info-chip-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fbd9df url('../../icons/drgroot-highlight.svg') center / 18px no-repeat;
+}
+
+.product-info .product-info-summary p {
+  margin: 0;
+}
+
+.product-info .product-info-summary p + p {
+  margin-top: 8px;
+}
+
+/* accordions */
+.product-info .product-info-accordions {
+  margin-top: 32px;
+}
+
+.product-info .product-info-item {
+  border-bottom: 1px solid var(--border-color, #d6d5cc);
+}
+
+.product-info .product-info-item-label {
+  position: relative;
+  display: block;
+  padding: 20px 32px 20px 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  list-style: none;
+  cursor: pointer;
+}
+
+.product-info .product-info-item-label::-webkit-details-marker {
+  display: none;
+}
+
+/* + icon; the vertical bar folds away when open */
+.product-info .product-info-item-label::before,
+.product-info .product-info-item-label::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  width: 14px;
+  height: 1.5px;
+  background-color: currentcolor;
+  transition: transform 0.2s ease;
+}
+
+.product-info .product-info-item-label::after {
+  transform: rotate(90deg);
+}
+
+.product-info .product-info-item[open] .product-info-item-label::after {
+  transform: rotate(0deg);
+}
+
+.product-info .product-info-item-body {
+  padding: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.product-info .product-info-item-body p {
+  margin: 0 0 12px;
+}
+
+.product-info .product-info-item-body ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.product-info .product-info-item-body li + li {
+  margin-top: 4px;
+}
+
+.product-info .product-info-item-body .product-info-specs {
+  padding-left: 0;
+  list-style: none;
+}
+
+.product-info .product-info-specs strong {
+  display: inline-block;
+  min-width: 72px;
+  margin-right: 8px;
+}

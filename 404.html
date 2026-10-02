@@ -7,13 +7,13 @@
     content="script-src 'nonce-aem' 'strict-dynamic' 'unsafe-inline' http: https:; base-uri 'self'; object-src 'none';"
     move-to-http-header="true"
   >
-  <title>Page not found</title>
+  <title>Page not found — WKND Adventures</title>
   <script nonce="aem" type="text/javascript">
     window.isErrorPage = true;
     window.errorCode = '404';
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta property="og:title" content="Page not found">
+  <meta property="og:title" content="Page not found — WKND Adventures">
   <script nonce="aem" src="/scripts/scripts.js" type="module"></script>
   <script nonce="aem" type="module">
     window.addEventListener('load', () => {
@@ -21,12 +21,12 @@
         const { origin, pathname } = new URL(document.referrer);
         if (origin === window.location.origin) {
           const backBtn = document.createElement('a');
-          backBtn.classList.add('button', 'error-button-back');
+          backBtn.classList.add('button', 'secondary');
           backBtn.href = pathname;
-          backBtn.textContent = 'Go back';
-          backBtn.title = 'Go back';
-          const btnContainer = document.querySelector('.button-container');
-          btnContainer.append(backBtn);
+          backBtn.textContent = 'Go Back';
+          backBtn.title = 'Go Back';
+          const group = document.querySelector('.error-actions');
+          group.append(backBtn);
         }
       }
     });
@@ -41,14 +41,45 @@
       min-height: calc(100vh - var(--nav-height));
       display: flex;
       align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
     }
 
-    main.error .error-number {
-      width: 100%;
+    main.error .section {
+      max-width: 600px;
     }
 
-    main.error .error-number text {
-      font-family: monospace;
+    .error-code {
+      font-family: var(--heading-font-family);
+      font-size: clamp(80px, 20vw, 200px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--accent-color);
+      margin: 0 0 16px;
+    }
+
+    .error-message {
+      font-family: var(--heading-font-family);
+      font-size: var(--heading-font-size-l);
+      font-weight: 700;
+      color: var(--text-color);
+      margin: 0 0 12px;
+    }
+
+    .error-description {
+      color: var(--text-color-muted);
+      font-size: var(--body-font-size-m);
+      line-height: 1.6;
+      margin: 0 0 32px;
+    }
+
+    .error-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
   </style>
   <link rel="stylesheet" href="/styles/lazy-styles.css">
@@ -58,13 +89,12 @@
   <header></header>
   <main class="error">
     <div class="section">
-      <svg viewBox="1 0 38 18" class="error-number">
-        <text x="0" y="17">404</text>
-      </svg>
-      <h2 class="error-message">Page Not Found</h2>
-      <p class="button-container">
-        <a href="/" class="button secondary error-button-home">Go home</a>
-      </p>
+      <p class="error-code">404</p>
+      <h1 class="error-message">Trail Not Found</h1>
+      <p class="error-description">The route you're looking for doesn't exist — it may have moved, or you may have taken a wrong turn. Every good adventure has a few of those.</p>
+      <div class="error-actions">
+        <a href="/" class="button primary">Go Home</a>
+      </div>
     </div>
   </main>
   <footer></footer>

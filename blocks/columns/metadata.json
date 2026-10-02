@@ -1,0 +1,55 @@
+{
+  "variantName": "columns",
+  "baseBlock": "columns",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "moderate",
+    "imagePattern": "single",
+    "hasGrid": true,
+    "purpose": "columns family: promo cards, pull-quote, about split, product summary and purchase info",
+    "structure": "columns-promo: 2 promo cards; columns-pullquote: list + dark quote 1:2; columns-about: text + 4:3 image; columns-product: large packshot left + category/name/rating/price/shipping right; columns-info: 3 equal small-print text columns with underlined titles"
+  },
+  "contentPattern": {
+    "structure": "one row, 2-3 cells (columns-product: image | category link, h1 name, rating, price with discount/strong sale/del original, shipping; columns-info: 3 x h3 + body text/list)"
+  },
+  "usage": {
+    "pagesUsing": [
+      {
+        "url": "https://drgroot.co.kr/product/detail.html?product_no=1119&cate_no=195&display_group=1",
+        "screenshot": "migration-work/screenshot.png"
+      }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-02T07:50:30.858Z"
+  },
+  "options": [
+    {
+      "class": "columns-promo",
+      "label": "Promo"
+    },
+    {
+      "class": "columns-pullquote",
+      "label": "Pullquote"
+    },
+    {
+      "class": "columns-about",
+      "label": "About"
+    },
+    {
+      "class": "columns-product",
+      "label": "Product"
+    },
+    {
+      "class": "columns-info",
+      "label": "Info"
+    }
+  ],
+  "memberVariantIds": [
+    "columns-promo",
+    "columns-pullquote",
+    "columns-about",
+    "columns-product",
+    "columns-info"
+  ]
+}

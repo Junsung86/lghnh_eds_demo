@@ -1,0 +1,162 @@
+{
+  "templates": [
+    {
+      "name": "product",
+      "urls": [
+        "https://drgroot.co.kr/product/detail.html?product_no=1119&cate_no=195&display_group=1"
+      ],
+      "representativeUrl": "https://drgroot.co.kr/product/detail.html?product_no=1119&cate_no=195&display_group=1",
+      "description": "Cafe24 product detail page (PDP) – static content migration; commerce widgets excluded",
+      "blocks": [
+        {
+          "name": "columns-product",
+          "instances": [
+            ".prdDetail_topArea > .prdDetail_infoArea"
+          ]
+        },
+        {
+          "name": "cards-product",
+          "instances": [
+            ".xans-product-relationlist.base_prd_list"
+          ]
+        },
+        {
+          "name": "cards-brandline",
+          "instances": [
+            ".base_layout_wrapper .prdDetail_banner_container"
+          ]
+        },
+        {
+          "name": "columns-info",
+          "instances": [
+            ".prdInfo_contents"
+          ]
+        }
+      ],
+      "urlPattern": "/product/*",
+      "sections": [
+        {
+          "id": "1",
+          "name": "Product summary",
+          "selector": [
+            ".prdDetail_topArea"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-product"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "2",
+          "name": "Related products",
+          "selector": [
+            "#prdRelatedWrap",
+            ".prdDetail_additionalArea"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-product"
+          ],
+          "defaultContent": [
+            ".relation h3.title"
+          ]
+        },
+        {
+          "id": "3",
+          "name": "Product detail images",
+          "selector": [
+            "#prdDetail > .cont > .content"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "#prdDetail > .cont > .content img"
+          ]
+        },
+        {
+          "id": "4",
+          "name": "Brand line promo",
+          "selector": [
+            "#prdDetail > .base_layout_wrapper",
+            ".base_layout_wrapper"
+          ],
+          "style": "secondary",
+          "blocks": [
+            "cards-brandline"
+          ],
+          "defaultContent": [
+            ".base_layout_wrapper .iv_section_title p",
+            ".base_layout_wrapper .iv_section_title h2",
+            ".base_layout_wrapper .iv_section_title a"
+          ]
+        },
+        {
+          "id": "5",
+          "name": "Reviews (excluded – backend widget)",
+          "selector": [
+            "#prdReview"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": []
+        },
+        {
+          "id": "6",
+          "name": "Purchase information",
+          "selector": [
+            "#prdInfo"
+          ],
+          "style": null,
+          "blocks": [
+            "columns-info"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "7",
+          "name": "Fixed option bar (excluded)",
+          "selector": [
+            "#prdDetail_fixed_optionArea"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": []
+        },
+        {
+          "id": "8",
+          "name": "Overlay / popup container (excluded)",
+          "selector": [
+            "body > div:nth-of-type(17)"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": []
+        },
+        {
+          "id": "9",
+          "name": "Chat plugin (excluded)",
+          "selector": [
+            "#ch-plugin"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": []
+        },
+        {
+          "id": "10",
+          "name": "Snapfit banner (excluded)",
+          "selector": [
+            "#spm_banner_main"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": []
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectType": "da"
+  }
+}

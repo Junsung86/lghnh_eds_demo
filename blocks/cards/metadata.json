@@ -1,0 +1,51 @@
+{
+  "variantName": "cards",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "moderate",
+    "imagePattern": "multiple",
+    "hasGrid": true,
+    "purpose": "cards family: article teasers, dark feature cards, related product tiles and product-line promo cards",
+    "structure": "cards-article: 16:10 image + tag pill + title + excerpt + link, 3-col; cards-feature: text-only glass cards, 3-col; cards-product: square image, centered name + price, 3-col; cards-brandline: lifestyle image, tagline, bold name, text link, 4-col beside intro in secondary section"
+  },
+  "contentPattern": {
+    "structure": "one row per card: image | body (cards-product: name link + price; cards-brandline: tagline + bold name + text link)",
+    "imageCount": 1
+  },
+  "usage": {
+    "pagesUsing": [
+      {
+        "url": "https://drgroot.co.kr/product/detail.html?product_no=1119&cate_no=195&display_group=1",
+        "screenshot": "migration-work/screenshot.png"
+      }
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-10-02T07:50:30.846Z"
+  },
+  "options": [
+    {
+      "class": "cards-article",
+      "label": "Article"
+    },
+    {
+      "class": "cards-feature",
+      "label": "Feature"
+    },
+    {
+      "class": "cards-product",
+      "label": "Product"
+    },
+    {
+      "class": "cards-brandline",
+      "label": "Brandline"
+    }
+  ],
+  "memberVariantIds": [
+    "cards-article",
+    "cards-feature",
+    "cards-product",
+    "cards-brandline"
+  ]
+}
