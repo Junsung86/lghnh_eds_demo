@@ -1,11 +1,11 @@
 /**
  * Product info: highlights, summary and accordions (details / features / how to use /
- * ingredients / claims) driven by an AEM GraphQL persisted query.
+ * ingredients / claims / FAQ) driven by an AEM GraphQL persisted query.
  *
  * Authored rows (label | content):
  *   1. endpoint row — content cell holds the persisted-query URL (link or text)
- *   2–8. snapshot rows in this order: highlights, summary, details, how to use, ingredients,
- *        features, claims (the last two are optional).
+ *   2–9. snapshot rows in this order: highlights, summary, details, how to use, ingredients,
+ *        features, claims, faq (the last three are optional).
  *        Labels are shown as headings; contents are the fallback when the live request fails
  *        (e.g. CORS not yet allowed on AEM publish).
  *
@@ -16,7 +16,7 @@
  */
 
 // row order is the authoring contract; new rows are only ever appended
-const KEYS = ['highlights', 'summary', 'details', 'howto', 'ingredients', 'features', 'claims'];
+const KEYS = ['highlights', 'summary', 'details', 'howto', 'ingredients', 'features', 'claims', 'faq'];
 const DEFAULT_LABELS = {
   highlights: '하이라이트',
   summary: '요약',
@@ -25,8 +25,9 @@ const DEFAULT_LABELS = {
   ingredients: '성분',
   features: '주요 특징',
   claims: '효능 근거',
+  faq: '자주 묻는 질문',
 };
-const ACCORDION_KEYS = ['details', 'features', 'howto', 'ingredients', 'claims'];
+const ACCORDION_KEYS = ['details', 'features', 'howto', 'ingredients', 'claims', 'faq'];
 const FETCH_TIMEOUT = 4000;
 
 const plain = (field) => (typeof field === 'string' ? field : field?.plaintext || '').trim();
@@ -80,6 +81,12 @@ function claimEntries(item) {
   ]).filter(([s]) => s);
 }
 
+// FAQ: question / answer pairs (also published as FAQPage in the page JSON-LD)
+function faqEntries(item) {
+  const answers = item.faqAnswers || [];
+  return (item.faqQuestions || []).map((q, i) => [q, plain(answers[i])]).filter(([q]) => q);
+}
+
 /** Maps a GraphQL product item to content nodes per section key */
 export function contentFromItem(item) {
   const specs = el('ul', 'product-info-specs');
@@ -110,6 +117,7 @@ export function contentFromItem(item) {
     ingredients: list(item.keyIngredients || []),
     features: titledList(featureEntries(item)),
     claims: titledList(claimEntries(item)),
+    faq: titledList(faqEntries(item)),
   };
 }
 

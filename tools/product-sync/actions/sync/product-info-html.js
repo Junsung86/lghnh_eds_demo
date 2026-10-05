@@ -6,11 +6,12 @@
 
 const plain = (field) => (typeof field === 'string' ? field : field?.plaintext || '').trim();
 
+// text nodes keep quotes as is (that is how DA stores them); attributes also escape quotes
 const esc = (text) => String(text)
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;');
+  .replace(/>/g, '&gt;');
+const escAttr = (text) => esc(text).replace(/"/g, '&quot;');
 
 function list(items) {
   const lis = items.filter(Boolean).map((t) => `<li>${esc(t)}</li>`).join('');
@@ -64,19 +65,23 @@ export function buildProductInfoBlock(item, endpoint) {
   const howTo = item.howToUse?.length ? item.howToUse : item.routine || [];
 
   const rows = [
-    row('GraphQL', `<p><a href="${esc(endpoint)}">${esc(endpoint)}</a></p>`),
+    row('GraphQL', `<p><a href="${escAttr(endpoint)}">${esc(endpoint)}</a></p>`),
     row('하이라이트', list([plain(item.functionalCosmetic).replace(/\s*\(.*\)\s*$/, '')])),
     row('요약', paras(plain(item.summary))),
     row('상세 정보', paras(plain(item.description) || plain(item.definition)) + (specs ? `<ul>${specs}</ul>` : '')),
     row('사용 방법', list(howTo)),
     row('성분', list(item.keyIngredients || [])),
   ];
-  // optional trailing rows: only when the product has feature / claim sets
-  const features = featureEntries(item);
-  const claims = claimEntries(item);
-  if (features.length || claims.length) {
-    rows.push(row('주요 특징', titledList(features)), row('효능 근거', titledList(claims)));
-  }
+  // optional trailing rows (positional): kept up to the last one that has data
+  const answers = item.faqAnswers || [];
+  const optional = [
+    ['주요 특징', featureEntries(item)],
+    ['효능 근거', claimEntries(item)],
+    ['자주 묻는 질문', (item.faqQuestions || []).map((q, i) => [q, plain(answers[i])]).filter(([q]) => q)],
+  ];
+  const last = optional.map(([, entries]) => entries.length > 0).lastIndexOf(true);
+  optional.slice(0, last + 1)
+    .forEach(([label, entries]) => rows.push(row(label, titledList(entries))));
 
   return `<div class="product-info">${rows.join('')}</div>`;
 }
@@ -106,6 +111,46 @@ export function replaceProductInfo(html, blockHtml) {
   const summary = findDiv(html, '<div class="columns columns-product">');
   if (summary) return html.slice(0, summary.end) + blockHtml + html.slice(summary.end);
   return null;
+}
+
+/** Top-level child <div>s of the block between start and end */
+function childDivs(html, { start, end }) {
+  const tags = /<(\/?)div\b[^>]*>/g;
+  tags.lastIndex = html.indexOf('>', start) + 1;
+  const children = [];
+  let depth = 0;
+  let childStart = -1;
+  for (let m = tags.exec(html); m && m.index < end; m = tags.exec(html)) {
+    if (!m[1]) {
+      if (depth === 0) childStart = m.index;
+      depth += 1;
+    } else {
+      depth -= 1;
+      if (depth === 0) children.push({ start: childStart, end: m.index + m[0].length });
+    }
+  }
+  return children;
+}
+
+const textOf = (html) => html.replace(/<[^>]+>/g, '').trim();
+
+/**
+ * Sets (value) or removes (null) one row of the page metadata block, leaving other rows as is.
+ * @returns {string} updated page HTML (unchanged if the page has no metadata block)
+ */
+export function setMetadata(html, key, value) {
+  const block = findDiv(html, '<div class="metadata">');
+  if (!block) return html;
+  // a row is <div><div>label</div><div>value</div></div>; match on the label cell text
+  const existing = childDivs(html, block).find((r) => {
+    const [label] = childDivs(html, r);
+    return label && textOf(html.slice(label.start, label.end)).toLowerCase() === key.toLowerCase();
+  });
+  const newRow = value === null ? '' : row(key, `<p>${esc(value)}</p>`);
+  if (existing) return html.slice(0, existing.start) + newRow + html.slice(existing.end);
+  if (!newRow) return html;
+  const close = block.end - '</div>'.length;
+  return html.slice(0, close) + newRow + html.slice(close);
 }
 
 /** Compares markup ignoring whitespace between tags (DA may reformat on save) */

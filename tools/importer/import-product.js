@@ -17,6 +17,7 @@ import drgrootProductInfoTransformer from './transformers/drgroot-product-info.j
 
 // GraphQL product data snapshot (node tools/importer/fetch-product-data.js), keyed by product_no
 import PRODUCT_DATA from './data/product-info.json';
+import productJsonLd from './product-jsonld.js';
 
 // PARSER REGISTRY
 const parsers = {
@@ -270,20 +271,23 @@ export default {
     executeTransformers('afterTransform', main, payload);
 
     // 5. Built-in rules
+    const u = new URL(originalURL);
+    const productNo = u.searchParams.get('product_no');
     const hr = document.createElement('hr');
     main.appendChild(hr);
     // Page metadata + "Theme: drgroot" so the page loads the Dr.Groot theme (styles/drgroot.css)
     const meta = WebImporter.Blocks.getMetadata(document) || {};
     meta.theme = 'drgroot';
+    // Product JSON-LD from the AEM product fragment snapshot (rendered in the page head)
+    const jsonLd = productNo && PRODUCT_DATA[productNo] && productJsonLd(PRODUCT_DATA[productNo].item);
+    if (jsonLd) meta['json-ld'] = jsonLd;
     main.append(WebImporter.Blocks.getMetadataBlock(document, meta));
     WebImporter.rules.transformBackgroundImages(main, document);
     WebImporter.rules.adjustImageUrls(main, url, originalURL);
 
     // 6. Path: product pages share /product/detail.html, so append product_no
     //    (from the query string) to keep one document per product.
-    const u = new URL(originalURL);
     let rawPath = u.pathname.replace(/\/$/, '').replace(/\.html?$/, '');
-    const productNo = u.searchParams.get('product_no');
     if (productNo) rawPath = `${rawPath}-${productNo}`;
     const path = WebImporter.FileUtils.sanitizePath(rawPath === '' ? '/index' : rawPath);
 

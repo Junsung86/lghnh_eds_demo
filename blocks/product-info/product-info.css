@@ -125,21 +125,28 @@
   list-style: none;
 }
 
-/* features / claims: title line above its text */
+/* features / claims / FAQ: title (question) line above its text (answer) */
 .product-info .product-info-features .product-info-item-body ul,
-.product-info .product-info-claims .product-info-item-body ul {
+.product-info .product-info-claims .product-info-item-body ul,
+.product-info .product-info-faq .product-info-item-body ul {
   padding-left: 0;
   list-style: none;
 }
 
 .product-info .product-info-features li + li,
-.product-info .product-info-claims li + li {
+.product-info .product-info-claims li + li,
+.product-info .product-info-faq li + li {
   margin-top: 12px;
 }
 
 .product-info .product-info-features li strong,
-.product-info .product-info-claims li strong {
+.product-info .product-info-claims li strong,
+.product-info .product-info-faq li strong {
   display: block;
+}
+
+.product-info .product-info-faq li strong::before {
+  content: "Q. ";
 }
 
 .product-info .product-info-specs strong {

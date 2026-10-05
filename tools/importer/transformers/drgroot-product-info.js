@@ -92,12 +92,15 @@ function buildCells(document, { endpoint, item }) {
     ['사용 방법', list(document, (item.howToUse && item.howToUse.length ? item.howToUse : item.routine) || [])],
     ['성분', list(document, item.keyIngredients || [])],
   ];
-  // optional trailing rows: only when the product has feature / claim sets
-  const features = featureEntries(item);
-  const claims = claimEntries(item);
-  if (features.length || claims.length) {
-    rows.push(['주요 특징', titledList(document, features)], ['효능 근거', titledList(document, claims)]);
-  }
+  // optional trailing rows (positional): kept up to the last one that has data
+  const answers = item.faqAnswers || [];
+  const optional = [
+    ['주요 특징', featureEntries(item)],
+    ['효능 근거', claimEntries(item)],
+    ['자주 묻는 질문', (item.faqQuestions || []).map((q, i) => [q, plain(answers[i])]).filter(([q]) => q)],
+  ];
+  const last = optional.map(([, entries]) => entries.length > 0).lastIndexOf(true);
+  optional.slice(0, last + 1).forEach(([label, entries]) => rows.push([label, titledList(document, entries)]));
   return rows;
 }
 

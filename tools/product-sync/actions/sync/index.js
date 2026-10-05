@@ -2,15 +2,20 @@
  * Adobe I/O Runtime action: keeps DA product pages in sync with AEM product content fragments.
  *
  * Triggered by the AEM event "aem.sites.contentFragment.published" (delivered by I/O Events).
- * For a mapped fragment it reads the published data, replaces the Product Info block in the
- * DA page /product/detail-{product_no} and previews the page. Publishing stays manual.
+ * For a mapped fragment it reads the published data, replaces the Product Info block and the
+ * "json-ld" metadata in the DA page /product/detail-{product_no} and previews the page.
+ * Publishing stays manual.
  *
  * Manual run: aio rt action invoke product-sync/sync -r -p path <fragment path> [-p dryRun true]
  */
 // shared with the importer; bundled into the action by aio at deploy time
-// eslint-disable-next-line import/no-relative-packages
+/* eslint-disable import/no-relative-packages */
 import PRODUCTS from '../../../importer/data/product-map.js';
-import { buildProductInfoBlock, replaceProductInfo, sameMarkup } from './product-info-html.js';
+import productJsonLd from '../../../importer/product-jsonld.js';
+/* eslint-enable import/no-relative-packages */
+import {
+  buildProductInfoBlock, replaceProductInfo, setMetadata, sameMarkup,
+} from './product-info-html.js';
 
 const DA_ADMIN = 'https://admin.da.live';
 const HLX_ADMIN = 'https://admin.hlx.page';
@@ -80,8 +85,10 @@ export async function main(params) {
   if (!docResp.ok) return fail(502, `DA read ${page}: HTTP ${docResp.status}`);
   const doc = await docResp.text();
 
-  const updated = replaceProductInfo(doc, buildProductInfoBlock(item, endpoint));
-  if (!updated) return done('skipped', { page, reason: 'page has no product summary block' });
+  const withBlock = replaceProductInfo(doc, buildProductInfoBlock(item, endpoint));
+  if (!withBlock) return done('skipped', { page, reason: 'page has no product summary block' });
+  // product JSON-LD in the page metadata (removed when the fragment no longer has one)
+  const updated = setMetadata(withBlock, 'json-ld', productJsonLd(item));
   if (sameMarkup(doc, updated)) return done('unchanged', { page });
   if (params.dryRun) return done('dry-run', { page, html: updated });
 

@@ -10,7 +10,8 @@ AEM author: publish product fragment
       1. map fragment path → product_no (tools/importer/data/product-map.js)
       2. read published data (persisted query, CDN cache bypassed, retried)
       3. GET DA page /product/detail-{product_no}, replace only the Product Info block
-         (inserted after the product summary if missing), skip if unchanged
+         (inserted after the product summary if missing) and the "json-ld" metadata row
+         (from jsonldtext, see tools/importer/product-jsonld.js), skip if unchanged
       4. POST the page back to DA, then preview it (admin.hlx.page). Publishing stays manual.
 ```
 

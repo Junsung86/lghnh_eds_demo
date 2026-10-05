@@ -1,7 +1,7 @@
 {
   "1119": {
     "endpoint": "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/lghnh_demo;path=/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
-    "fetchedAt": "2026-10-05T14:18:22.011Z",
+    "fetchedAt": "2026-10-05T14:30:44.994Z",
     "item": {
       "_path": "/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
       "name": "리엔 닥터그루트 마이크로바이옴 바이오엑소좀 샴푸",
@@ -202,7 +202,7 @@
   },
   "1218": {
     "endpoint": "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/geo-product-by-path;path=/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
-    "fetchedAt": "2026-10-05T14:18:23.322Z",
+    "fetchedAt": "2026-10-05T14:30:46.546Z",
     "item": {
       "_path": "/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
       "name": "닥터그루트 PDRN⁺ 헤어엔 스칼프 볼륨팩",

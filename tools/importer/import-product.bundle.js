@@ -744,11 +744,14 @@ var CustomImportScript = (() => {
       ["\uC0AC\uC6A9 \uBC29\uBC95", list(document, (item.howToUse && item.howToUse.length ? item.howToUse : item.routine) || [])],
       ["\uC131\uBD84", list(document, item.keyIngredients || [])]
     ];
-    const features = featureEntries(item);
-    const claims = claimEntries(item);
-    if (features.length || claims.length) {
-      rows.push(["\uC8FC\uC694 \uD2B9\uC9D5", titledList(document, features)], ["\uD6A8\uB2A5 \uADFC\uAC70", titledList(document, claims)]);
-    }
+    const answers = item.faqAnswers || [];
+    const optional = [
+      ["\uC8FC\uC694 \uD2B9\uC9D5", featureEntries(item)],
+      ["\uD6A8\uB2A5 \uADFC\uAC70", claimEntries(item)],
+      ["\uC790\uC8FC \uBB3B\uB294 \uC9C8\uBB38", (item.faqQuestions || []).map((q, i) => [q, plain(answers[i])]).filter(([q]) => q)]
+    ];
+    const last = optional.map(([, entries]) => entries.length > 0).lastIndexOf(true);
+    optional.slice(0, last + 1).forEach(([label, entries]) => rows.push([label, titledList(document, entries)]));
     return rows;
   }
   function transform3(hookName, element, payload) {
@@ -772,7 +775,7 @@ var CustomImportScript = (() => {
   var product_info_default = {
     "1119": {
       endpoint: "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/lghnh_demo;path=/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
-      fetchedAt: "2026-10-05T14:18:22.011Z",
+      fetchedAt: "2026-10-05T14:30:44.994Z",
       item: {
         _path: "/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
         name: "\uB9AC\uC5D4 \uB2E5\uD130\uADF8\uB8E8\uD2B8 \uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uC0F4\uD478",
@@ -973,7 +976,7 @@ var CustomImportScript = (() => {
     },
     "1218": {
       endpoint: "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/geo-product-by-path;path=/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
-      fetchedAt: "2026-10-05T14:18:23.322Z",
+      fetchedAt: "2026-10-05T14:30:46.546Z",
       item: {
         _path: "/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
         name: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329",
@@ -1208,6 +1211,20 @@ var CustomImportScript = (() => {
     }
   };
 
+  // tools/importer/product-jsonld.js
+  function productJsonLd(item) {
+    const texts = (item?.jsonldtext || []).map((part) => (typeof part === "string" ? part : part?.plaintext || "").trim()).filter(Boolean);
+    let data = item?.jsonLd || null;
+    if (!data && texts.length === 1) {
+      try {
+        data = JSON.parse(texts[0]);
+      } catch (e) {
+        data = null;
+      }
+    }
+    return data && typeof data === "object" && Object.keys(data).length ? JSON.stringify(data) : null;
+  }
+
   // tools/importer/import-product.js
   var parsers = {
     "columns-product": parse,
@@ -1430,16 +1447,18 @@ var CustomImportScript = (() => {
         }
       });
       executeTransformers("afterTransform", main, payload);
+      const u = new URL(originalURL);
+      const productNo = u.searchParams.get("product_no");
       const hr = document.createElement("hr");
       main.appendChild(hr);
       const meta = WebImporter.Blocks.getMetadata(document) || {};
       meta.theme = "drgroot";
+      const jsonLd = productNo && product_info_default[productNo] && productJsonLd(product_info_default[productNo].item);
+      if (jsonLd) meta["json-ld"] = jsonLd;
       main.append(WebImporter.Blocks.getMetadataBlock(document, meta));
       WebImporter.rules.transformBackgroundImages(main, document);
       WebImporter.rules.adjustImageUrls(main, url, originalURL);
-      const u = new URL(originalURL);
       let rawPath = u.pathname.replace(/\/$/, "").replace(/\.html?$/, "");
-      const productNo = u.searchParams.get("product_no");
       if (productNo) rawPath = `${rawPath}-${productNo}`;
       const path = WebImporter.FileUtils.sanitizePath(rawPath === "" ? "/index" : rawPath);
       return [{
