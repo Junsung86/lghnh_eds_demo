@@ -31,6 +31,36 @@ function paras(document, text) {
   });
 }
 
+function titledList(document, entries) {
+  const ul = document.createElement('ul');
+  entries.forEach(([title, text]) => {
+    const li = document.createElement('li');
+    const strong = document.createElement('strong');
+    strong.textContent = title;
+    li.append(strong);
+    if (text) li.append(document.createTextNode(` ${text}`));
+    ul.append(li);
+  });
+  return ul;
+}
+
+// referenced fragments: featureSet/claimSet (current model) or features/claims (older queries)
+function featureEntries(item) {
+  const set = item.featureSet || item.features || {};
+  const summaries = set.featureSummaries || [];
+  return (set.featureTitles || []).map((title, i) => [title, plain(summaries[i])]).filter(([t]) => t);
+}
+
+function claimEntries(item) {
+  const set = item.claimSet || item.claims || {};
+  const filled = (v) => v && v.trim() !== '-';
+  // "statement: value · condition · footnote"; '-' marks an empty value in the claim set
+  return (set.statements || []).map((statement, i) => [
+    statement,
+    [(set.claimValues || [])[i], (set.conditions || [])[i], plain((set.footnotes || [])[i])].filter(filled).join(' · '),
+  ]).filter(([s]) => s);
+}
+
 function buildCells(document, { endpoint, item }) {
   const link = document.createElement('a');
   link.href = endpoint;
@@ -53,15 +83,22 @@ function buildCells(document, { endpoint, item }) {
     specs.append(li);
   });
 
-  return [
+  const rows = [
     ['Product Info'],
     ['GraphQL', link],
     ['하이라이트', list(document, [plain(item.functionalCosmetic).replace(/\s*\(.*\)\s*$/, '')])],
     ['요약', paras(document, plain(item.summary))],
     ['상세 정보', [...paras(document, plain(item.description) || plain(item.definition)), specs]],
-    ['사용 방법', list(document, item.routine || [])],
+    ['사용 방법', list(document, (item.howToUse && item.howToUse.length ? item.howToUse : item.routine) || [])],
     ['성분', list(document, item.keyIngredients || [])],
   ];
+  // optional trailing rows: only when the product has feature / claim sets
+  const features = featureEntries(item);
+  const claims = claimEntries(item);
+  if (features.length || claims.length) {
+    rows.push(['주요 특징', titledList(document, features)], ['효능 근거', titledList(document, claims)]);
+  }
+  return rows;
 }
 
 export default function transform(hookName, element, payload) {

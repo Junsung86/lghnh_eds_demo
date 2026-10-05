@@ -1,0 +1,13 @@
+{
+  "status": "success",
+  "url": "https://drgroot.co.kr/product/detail.html?product_no=1218&cate_no=195&display_group=1",
+  "path": "product/detail-1218",
+  "timestamp": "2026-10-05T14:21:31.029Z",
+  "title": "PDRN 볼륨 두피 헤어팩 - 닥터그루트 공식 온라인 스토어",
+  "template": "product",
+  "blocks": [
+    "columns-product",
+    "cards-brandline",
+    "columns-info"
+  ]
+}

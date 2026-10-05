@@ -1,0 +1,12 @@
+{
+  "name": "product-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Syncs AEM product content fragments into DA product pages (Adobe I/O Runtime)",
+  "scripts": {
+    "dry-run": "node test/dry-run.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

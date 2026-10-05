@@ -13,18 +13,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const ENDPOINT_BASE = 'https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/lghnh_demo';
+const ENDPOINT_BASE = 'https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds';
 
-// Cafe24 product_no -> AEM content fragment path
-const PRODUCTS = {
-  1119: '/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product',
-};
+// Cafe24 product_no -> { query, path } (shared with tools/product-sync)
+const { default: PRODUCTS } = require('./data/product-map.js');
 
 (async () => {
   const out = {};
-  for (const [productNo, fragmentPath] of Object.entries(PRODUCTS)) {
-    const endpoint = `${ENDPOINT_BASE};path=${fragmentPath}`;
-    const resp = await fetch(endpoint);
+  for (const [productNo, { query, path: fragmentPath }] of Object.entries(PRODUCTS)) {
+    const endpoint = `${ENDPOINT_BASE}/${query};path=${fragmentPath}`;
+    // bypass the CDN cache (s-maxage 2h) so freshly published data is read
+    const resp = await fetch(`${endpoint}?ck=${Date.now()}`);
     if (!resp.ok) throw new Error(`${productNo}: HTTP ${resp.status}`);
     const json = await resp.json();
     const item = json?.data?.geoProductV2ByPath?.item;

@@ -1,10 +1,11 @@
 /**
- * Product info: highlights, summary and accordions (details / how to use / ingredients)
- * driven by an AEM GraphQL persisted query.
+ * Product info: highlights, summary and accordions (details / features / how to use /
+ * ingredients / claims) driven by an AEM GraphQL persisted query.
  *
  * Authored rows (label | content):
  *   1. endpoint row — content cell holds the persisted-query URL (link or text)
- *   2–6. snapshot rows in this order: highlights, summary, details, how to use, ingredients.
+ *   2–8. snapshot rows in this order: highlights, summary, details, how to use, ingredients,
+ *        features, claims (the last two are optional).
  *        Labels are shown as headings; contents are the fallback when the live request fails
  *        (e.g. CORS not yet allowed on AEM publish).
  *
@@ -14,11 +15,18 @@
  * itself under the summary text (below the shipping note).
  */
 
-const KEYS = ['highlights', 'summary', 'details', 'howto', 'ingredients'];
+// row order is the authoring contract; new rows are only ever appended
+const KEYS = ['highlights', 'summary', 'details', 'howto', 'ingredients', 'features', 'claims'];
 const DEFAULT_LABELS = {
-  highlights: '하이라이트', summary: '요약', details: '상세 정보', howto: '사용 방법', ingredients: '성분',
+  highlights: '하이라이트',
+  summary: '요약',
+  details: '상세 정보',
+  howto: '사용 방법',
+  ingredients: '성분',
+  features: '주요 특징',
+  claims: '효능 근거',
 };
-const ACCORDION_KEYS = ['details', 'howto', 'ingredients'];
+const ACCORDION_KEYS = ['details', 'features', 'howto', 'ingredients', 'claims'];
 const FETCH_TIMEOUT = 4000;
 
 const plain = (field) => (typeof field === 'string' ? field : field?.plaintext || '').trim();
@@ -40,6 +48,36 @@ function paragraphs(text) {
   const frag = document.createDocumentFragment();
   text.split(/\n+/).map((t) => t.trim()).filter(Boolean).forEach((t) => frag.append(el('p', '', t)));
   return frag;
+}
+
+/** list of "<strong>title</strong> text" items */
+function titledList(entries) {
+  const ul = el('ul');
+  entries.forEach(([title, text]) => {
+    const li = el('li');
+    li.append(el('strong', '', title));
+    if (text) li.append(document.createTextNode(` ${text}`));
+    ul.append(li);
+  });
+  return ul;
+}
+
+// referenced fragments: featureSet/claimSet (current model) or features/claims (older queries)
+function featureEntries(item) {
+  const set = item.featureSet || item.features || {};
+  const summaries = set.featureSummaries || [];
+  return (set.featureTitles || []).map((title, i) => [title, plain(summaries[i])])
+    .filter(([t]) => t);
+}
+
+// "statement: value · condition · footnote"; '-' marks an empty value in the claim set
+function claimEntries(item) {
+  const set = item.claimSet || item.claims || {};
+  const filled = (v) => v && v.trim() !== '-';
+  return (set.statements || []).map((statement, i) => [
+    statement,
+    [set.claimValues?.[i], set.conditions?.[i], plain(set.footnotes?.[i])].filter(filled).join(' · '),
+  ]).filter(([s]) => s);
 }
 
 /** Maps a GraphQL product item to content nodes per section key */
@@ -67,8 +105,11 @@ export function contentFromItem(item) {
     highlights: list([plain(item.functionalCosmetic).replace(/\s*\(.*\)\s*$/, '')]),
     summary: paragraphs(plain(item.summary)),
     details,
-    howto: list(item.routine || []),
+    // step-by-step usage when the model provides it, otherwise the care routine
+    howto: list(item.howToUse?.length ? item.howToUse : item.routine || []),
     ingredients: list(item.keyIngredients || []),
+    features: titledList(featureEntries(item)),
+    claims: titledList(claimEntries(item)),
   };
 }
 
@@ -97,27 +138,29 @@ function readAuthored(block) {
 function render(block, labels, content) {
   const wrap = document.createDocumentFragment();
 
-  if (content.highlights) {
+  // sections without data (e.g. a fragment with only a few fields filled) are skipped
+  const chips = el('ul', 'product-info-chips');
+  content.highlights?.querySelectorAll?.('li, p').forEach((item) => {
+    const text = item.textContent.trim();
+    if (!text) return;
+    const chip = el('li', 'product-info-chip');
+    chip.append(el('span', 'product-info-chip-icon'), el('span', 'product-info-chip-label', text));
+    chips.append(chip);
+  });
+  if (chips.children.length) {
     const sec = el('div', 'product-info-section product-info-highlights');
-    sec.append(el('h2', 'product-info-heading', labels.highlights));
-    const chips = el('ul', 'product-info-chips');
-    content.highlights.querySelectorAll?.('li, p').forEach((item) => {
-      const chip = el('li', 'product-info-chip');
-      chip.append(el('span', 'product-info-chip-icon'), el('span', 'product-info-chip-label', item.textContent.trim()));
-      chips.append(chip);
-    });
-    sec.append(chips);
+    sec.append(el('h2', 'product-info-heading', labels.highlights), chips);
     wrap.append(sec);
   }
 
-  if (content.summary) {
+  if (content.summary?.textContent.trim()) {
     const sec = el('div', 'product-info-section product-info-summary');
     sec.append(el('h2', 'product-info-heading', labels.summary), content.summary);
     wrap.append(sec);
   }
 
   const accordions = el('div', 'product-info-accordions');
-  ACCORDION_KEYS.filter((k) => content[k]?.childNodes?.length).forEach((key) => {
+  ACCORDION_KEYS.filter((k) => content[k]?.textContent.trim()).forEach((key) => {
     const details = el('details', `product-info-item product-info-${key}`);
     details.append(el('summary', 'product-info-item-label', labels[key]));
     const body = el('div', 'product-info-item-body');

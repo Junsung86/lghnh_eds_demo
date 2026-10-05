@@ -1,26 +1,8 @@
-/* eslint-disable */
 var CustomImportScript = (() => {
   var __defProp = Object.defineProperty;
-  var __defProps = Object.defineProperties;
   var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-  var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __propIsEnum = Object.prototype.propertyIsEnumerable;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-  var __spreadValues = (a, b) => {
-    for (var prop in b || (b = {}))
-      if (__hasOwnProp.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    if (__getOwnPropSymbols)
-      for (var prop of __getOwnPropSymbols(b)) {
-        if (__propIsEnum.call(b, prop))
-          __defNormalProp(a, prop, b[prop]);
-      }
-    return a;
-  };
-  var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
@@ -119,7 +101,7 @@ var CustomImportScript = (() => {
       }
       if (original && original !== sale) {
         if (sale) p.append(document.createTextNode(" "));
-        const del = document.createElement("s");
+        const del = document.createElement("del");
         del.textContent = withWon(original);
         p.append(del);
       }
@@ -708,6 +690,31 @@ var CustomImportScript = (() => {
       return p;
     });
   }
+  function titledList(document, entries) {
+    const ul = document.createElement("ul");
+    entries.forEach(([title, text]) => {
+      const li = document.createElement("li");
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+      li.append(strong);
+      if (text) li.append(document.createTextNode(` ${text}`));
+      ul.append(li);
+    });
+    return ul;
+  }
+  function featureEntries(item) {
+    const set = item.featureSet || item.features || {};
+    const summaries = set.featureSummaries || [];
+    return (set.featureTitles || []).map((title, i) => [title, plain(summaries[i])]).filter(([t]) => t);
+  }
+  function claimEntries(item) {
+    const set = item.claimSet || item.claims || {};
+    const filled = (v) => v && v.trim() !== "-";
+    return (set.statements || []).map((statement, i) => [
+      statement,
+      [(set.claimValues || [])[i], (set.conditions || [])[i], plain((set.footnotes || [])[i])].filter(filled).join(" \xB7 ")
+    ]).filter(([s]) => s);
+  }
   function buildCells(document, { endpoint, item }) {
     const link = document.createElement("a");
     link.href = endpoint;
@@ -728,15 +735,21 @@ var CustomImportScript = (() => {
       li.append(strong, document.createTextNode(` ${v}`));
       specs.append(li);
     });
-    return [
+    const rows = [
       ["Product Info"],
       ["GraphQL", link],
       ["\uD558\uC774\uB77C\uC774\uD2B8", list(document, [plain(item.functionalCosmetic).replace(/\s*\(.*\)\s*$/, "")])],
       ["\uC694\uC57D", paras(document, plain(item.summary))],
       ["\uC0C1\uC138 \uC815\uBCF4", [...paras(document, plain(item.description) || plain(item.definition)), specs]],
-      ["\uC0AC\uC6A9 \uBC29\uBC95", list(document, item.routine || [])],
+      ["\uC0AC\uC6A9 \uBC29\uBC95", list(document, (item.howToUse && item.howToUse.length ? item.howToUse : item.routine) || [])],
       ["\uC131\uBD84", list(document, item.keyIngredients || [])]
     ];
+    const features = featureEntries(item);
+    const claims = claimEntries(item);
+    if (features.length || claims.length) {
+      rows.push(["\uC8FC\uC694 \uD2B9\uC9D5", titledList(document, features)], ["\uD6A8\uB2A5 \uADFC\uAC70", titledList(document, claims)]);
+    }
+    return rows;
   }
   function transform3(hookName, element, payload) {
     if (hookName !== TransformHook2.afterTransform) return;
@@ -759,7 +772,7 @@ var CustomImportScript = (() => {
   var product_info_default = {
     "1119": {
       endpoint: "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/lghnh_demo;path=/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
-      fetchedAt: "2026-10-02T09:04:52.542Z",
+      fetchedAt: "2026-10-05T14:18:22.011Z",
       item: {
         _path: "/content/dam/ref-demo-eds/geo-pilot/drgroot-bioexosome-shampoo-400ml/product",
         name: "\uB9AC\uC5D4 \uB2E5\uD130\uADF8\uB8E8\uD2B8 \uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uC0F4\uD478",
@@ -767,7 +780,7 @@ var CustomImportScript = (() => {
         brand: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 (Dr.Groot)",
         line: "\uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880",
         category: "\uD5E4\uC5B4\uCF00\uC5B4 > \uC0F4\uD478 > \uD0C8\uBAA8\xB7\uB450\uD53C",
-        volume: "400ml",
+        volume: "330ml",
         functionalCosmetic: "\uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488 (\uC2DD\uC57D\uCC98 \uC2EC\uC0AC \uB610\uB294 \uBCF4\uACE0 \uD544\uD568)",
         recommendedFor: [
           "\uBAA8\uB4E0 \uB450\uD53C",
@@ -955,57 +968,242 @@ var CustomImportScript = (() => {
         },
         verified: false,
         lastVerified: "2026-10-02",
-        jsonLd: {
-          "@context": "https://schema.org",
-          "@graph": [
+        jsonLd: null
+      }
+    },
+    "1218": {
+      endpoint: "https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds/geo-product-by-path;path=/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
+      fetchedAt: "2026-10-05T14:18:23.322Z",
+      item: {
+        _path: "/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/product",
+        name: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329",
+        displayName: "PDRN \uBCFC\uB968 \uB450\uD53C \uD5E4\uC5B4\uD329",
+        brand: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 (Dr.Groot)",
+        line: "PDRN\u207A",
+        category: "\uD5E4\uC5B4\uCF00\uC5B4 > \uD5E4\uC5B4\uD329\xB7\uD2B8\uB9AC\uD2B8\uBA3C\uD2B8 > \uB450\uD53C\xB7\uBCFC\uB968",
+        barcode: "8800335743281",
+        volume: "180ml",
+        functionalCosmetic: "\uD0C8\uBAA8 \uC99D\uC0C1\uC758 \uC644\uD654\uC5D0 \uB3C4\uC6C0\uC744 \uC8FC\uB294 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488 (\uC9C8\uBCD1\uC758 \uC608\uBC29 \uBC0F \uCE58\uB8CC\uB97C \uC704\uD55C \uC758\uC57D\uD488 \uC544\uB2D8)",
+        recommendedFor: [
+          "\uBFCC\uB9AC \uBCFC\uB968\uC774 \uC27D\uAC8C \uAC00\uB77C\uC549\uB294 \uBAA8\uBC1C",
+          "\uAC1C\uC6B4\uD558\uC9C0 \uC54A\uC740 \uB450\uD53C",
+          "\uC5D0\uC13C\uC2A4\uB97C \uBC1C\uB77C\uB3C4 \uBFCC\uB9AC\uBD80\uD130 \uCC98\uC9C0\uB294 \uBAA8\uBC1C",
+          "\uB450\uD53C\xB7\uC5BC\uAD74 \uD2B8\uB7EC\uBE14\uC774 \uAC71\uC815\uB418\uB294 \uACBD\uC6B0"
+        ],
+        keyIngredients: [
+          "\uC18C\uB4D0\uB514\uC5D4\uC5D0\uC774 (PDRN)",
+          "\uBFCC\uB9AC \uBCFC\uB968 \uD2B9\uD5C8 \uC131\uBD84 (\uD2B9\uD5C8 \uC81C10-2505580\uD638)",
+          "\uB85C\uC988\uB9C8\uB9AC\uC78E\uC624\uC77C",
+          "\uBCD1\uD480\uC78E\uCD94\uCD9C\uBB3C (\uC13C\uD154\uB77C)",
+          "\uC0B4\uB9AC\uC2E4\uB9AD\uC560\uC528\uB4DC",
+          "\uB098\uC774\uC544\uC2E0\uC544\uB9C8\uC774\uB4DC",
+          "\uBC14\uC774\uC624\uD2F4",
+          "\uCE74\uD398\uC778",
+          "\uD558\uC774\uB4DC\uB864\uB77C\uC774\uC988\uB4DC\uCF5C\uB77C\uAC90",
+          "\uD310\uD14C\uB180",
+          "\uBA58\uD1A8"
+        ],
+        scent: "\uD50C\uB85C\uB7F4",
+        scentNotes: [
+          "Top: \uB85C\uC988\uC5D0\uC13C\uC2A4, \uADF8\uB9B0 \uC544\uC774\uBE44",
+          "Middle: \uBE14\uB799\uCEE4\uB7F0\uD2B8 \uC2F9, \uBAA8\uC2A4(\uC774\uB07C)",
+          "Base: \uC0CC\uB2EC\uC6B0\uB4DC, \uD1B5\uCE74\uBE48"
+        ],
+        definition: {
+          plaintext: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 LG\uC0DD\uD65C\uAC74\uAC15\uC774 \uB9CC\uB4E0 180ml \uB450\uD53C \uC804\uC6A9 \uBCFC\uB968 \uD5E4\uC5B4\uD329\uC73C\uB85C, \uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4."
+        },
+        summary: {
+          plaintext: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uBAA8\uBC1C \uB05D\uC774 \uC544\uB2CC \uB450\uD53C\uC640 \uBAA8\uBC1C \uBFCC\uB9AC\uC5D0 \uBC14\uB974\uB294 180ml \uB450\uD53C \uC804\uC6A9 \uBCFC\uB968 \uD5E4\uC5B4\uD329\uC774\uBA70, \uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4."
+        },
+        description: {
+          plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 PDRN(\uC18C\uB4D0\uB514\uC5D4\uC5D0\uC774), \uB85C\uC988\uB9C8\uB9AC\uC78E\uC624\uC77C, \uBCD1\uD480\uC78E\uCD94\uCD9C\uBB3C\uACFC \uBFCC\uB9AC \uBCFC\uB968 \uD2B9\uD5C8 \uC131\uBD84\uC744 \uB2F4\uC740 \uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00 \uC81C\uD615\uC785\uB2C8\uB2E4. \uD758\uB7EC\uB0B4\uB9AC\uC9C0 \uC54A\uB294 \uCAC0\uB4DD\uD55C \uC5D0\uC5B4\uB9AC \uC81C\uD615\uC774 \uB450\uD53C\uC5D0 \uBC00\uCC29\uD574 \uAC01\uC9C8, \uB178\uD3D0\uBB3C, \uC720\uBD84\uC744 \uD761\uCC29\uD558\uBA70, \uC778\uCCB4\uC801\uC6A9\uC2DC\uD5D8\uC5D0\uC11C \uC0AC\uC6A9 \uC9C1\uD6C4 \uB450\uD53C \uAC01\uC9C8\uACFC \uD53C\uC9C0 \uC9C0\uD45C\uAC00, 2\uC8FC \uC0AC\uC6A9 \uD6C4 \uD0C8\uB77D \uBAA8\uBC1C \uC218\uAC00 \uAC1C\uC120\uB418\uC5C8\uC2B5\uB2C8\uB2E4(\uC2DC\uD5D8 \uC870\uAC74\uC740 Claim Set \uCC38\uACE0). \uD5A5\uC740 \uB85C\uC988\uC5D0\uC13C\uC2A4\uB97C \uD0D1\uB178\uD2B8\uB85C \uD55C \uD50C\uB85C\uB7F4 \uD5A5\uC785\uB2C8\uB2E4."
+        },
+        howToUse: [
+          "\uC0F4\uD478 \uD6C4 \uC628\uC218\uB85C \uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uCDA9\uBD84\uD788 \uC801\uC2ED\uB2C8\uB2E4.",
+          "\uC801\uB2F9\uB7C9\uC744 \uBAA8\uBC1C\uACFC \uB450\uD53C\uC5D0 \uACE8\uACE0\uB8E8 \uBC14\uB985\uB2C8\uB2E4.",
+          "\uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uB9C8\uC0AC\uC9C0\uD569\uB2C8\uB2E4.",
+          "\uBB3C\uB85C \uAE68\uB057\uC774 \uD5F9\uAD7D\uB2C8\uB2E4."
+        ],
+        routine: [
+          "PDRN\u207A 3\uB2E8\uACC4 \uB450\uD53C & \uBCFC\uB968 \uCF00\uC5B4: \uBCFC\uB968 \uBD80\uC2A4\uD305 \uC570\uD50C \uC0F4\uD478(\uB450\uD53C \uBAA8\uACF5 \uD0C4\uB825) \u2192 \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329(\uC7A5\uBCBD & \uBCFC\uB968 \uAC15\uD654) \u2192 \uB450\uD53C \uC601\uC591 \uD1A0\uB2C9(\uB450\uD53C \uC7A5\uBCBD \uAC15\uD654)",
+          "\uD0C8\uBAA8 \uC9D1\uC911 \uCF00\uC5B4: \uD5E4\uC5B4\uB77C\uC778 \uBD80\uC2A4\uD130\uC0F7 \uC570\uD50C",
+          "\uBC14\uB974\uACE0 \uC57D 3\uBD84 \uAE30\uB2E4\uB9AC\uB294 \uB3D9\uC548 \uC591\uCE58\xB7\uC81C\uBAA8 \uB4F1 \uB2E4\uB978 \uCF00\uC5B4\uB97C \uBCD1\uD589\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+        ],
+        faqQuestions: [
+          "\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC778\uAC00\uC694?",
+          "PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uC5B4\uB5BB\uAC8C \uC0AC\uC6A9\uD558\uB098\uC694?",
+          "\uC774 \uD5E4\uC5B4\uD329\uC5D0 \uC2E4\uB9AC\uCF58\uC774 \uB4E4\uC5B4 \uC788\uB098\uC694?",
+          "\uC5B4\uB5A4 \uACE0\uBBFC\uC774 \uC788\uC744 \uB54C \uC4F0\uBA74 \uC88B\uC740\uAC00\uC694?",
+          "\uC5B4\uB5A4 \uD5A5\uC778\uAC00\uC694?",
+          "\uC6A9\uB7C9\uC740 \uC5BC\uB9C8\uC778\uAC00\uC694?"
+        ],
+        faqAnswers: [
+          {
+            plaintext: "\uB124, \uD0C8\uBAA8 \uC99D\uC0C1\uC758 \uC644\uD654\uC5D0 \uB3C4\uC6C0\uC744 \uC8FC\uB294 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4. \uC9C8\uBCD1\uC758 \uC608\uBC29\uC774\uB098 \uCE58\uB8CC\uB97C \uC704\uD55C \uC758\uC57D\uD488\uC740 \uC544\uB2D9\uB2C8\uB2E4."
+          },
+          {
+            plaintext: "\uC0F4\uD478 \uD6C4 \uC628\uC218\uB85C \uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uCDA9\uBD84\uD788 \uC801\uC2DC\uACE0, \uC801\uB2F9\uB7C9\uC744 \uBAA8\uBC1C\uACFC \uB450\uD53C\uC5D0 \uACE8\uACE0\uB8E8 \uBC14\uB978 \uB4A4 \uB9C8\uC0AC\uC9C0\uD558\uACE0 \uBB3C\uB85C \uAE68\uB057\uC774 \uD5F9\uAD7D\uB2C8\uB2E4."
+          },
+          {
+            plaintext: "\uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00 \uC81C\uD615\uC785\uB2C8\uB2E4."
+          },
+          {
+            plaintext: "\uBFCC\uB9AC \uBCFC\uB968\uC774 \uC27D\uAC8C \uAC00\uB77C\uC549\uAC70\uB098, \uB450\uD53C\uAC00 \uAC1C\uC6B4\uD558\uC9C0 \uC54A\uAC70\uB098, \uBAA8\uBC1C \uB05D\uC5D0\uB9CC \uC4F0\uB294 \uD329\uC73C\uB85C\uB294 \uBFCC\uB9AC \uBCFC\uB968\uC774 \uC720\uC9C0\uB418\uC9C0 \uC54A\uC744 \uB54C \uC4F0\uB294 \uB450\uD53C \uC804\uC6A9 \uBCFC\uB968\uD329\uC785\uB2C8\uB2E4."
+          },
+          {
+            plaintext: "\uB85C\uC988\uC5D0\uC13C\uC2A4\uC640 \uADF8\uB9B0 \uC544\uC774\uBE44(top), \uBE14\uB799\uCEE4\uB7F0\uD2B8 \uC2F9\uACFC \uBAA8\uC2A4(middle), \uC0CC\uB2EC\uC6B0\uB4DC\uC640 \uD1B5\uCE74\uBE48(base)\uC73C\uB85C \uAD6C\uC131\uB41C \uD50C\uB85C\uB7F4 \uD5A5\uC785\uB2C8\uB2E4."
+          },
+          {
+            plaintext: "180ml(6.5 fl oz)\uC785\uB2C8\uB2E4."
+          }
+        ],
+        relatedProducts: [
+          "PDRN\u207A \uBCFC\uB968 \uBD80\uC2A4\uD305 \uC570\uD50C \uC0F4\uD478",
+          "PDRN\u207A \uB450\uD53C \uC601\uC591 \uD1A0\uB2C9",
+          "PDRN\u207A \uD5E4\uC5B4\uB77C\uC778 \uBD80\uC2A4\uD130\uC0F7 \uC570\uD50C"
+        ],
+        cautions: {
+          plaintext: "1. \uD654\uC7A5\uD488 \uC0AC\uC6A9 \uC2DC \uB610\uB294 \uC0AC\uC6A9 \uD6C4 \uC9C1\uC0AC\uAD11\uC120\uC5D0 \uC758\uD558\uC5EC \uC0AC\uC6A9\uBD80\uC704\uAC00 \uBD89\uC740 \uBC18\uC810, \uBD80\uC5B4\uC624\uB984 \uB610\uB294 \uAC00\uB824\uC6C0\uC99D \uB4F1\uC758 \uC774\uC0C1 \uC99D\uC0C1\uC774\uB098 \uBD80\uC791\uC6A9\uC774 \uC788\uB294 \uACBD\uC6B0\uC5D0\uB294 \uC804\uBB38\uC758 \uB4F1\uACFC \uC0C1\uB2F4\uD560 \uAC83. 2. \uC0C1\uCC98\uAC00 \uC788\uB294 \uBD80\uC704 \uB4F1\uC5D0\uB294 \uC0AC\uC6A9\uC744 \uC790\uC81C\uD560 \uAC83. 3. \uBCF4\uAD00 \uBC0F \uCDE8\uAE09 \uC2DC \uC8FC\uC758\uC0AC\uD56D \uAC00) \uC5B4\uB9B0\uC774\uC758 \uC190\uC774 \uB2FF\uC9C0 \uC54A\uB294 \uACF3\uC5D0 \uBCF4\uAD00\uD560 \uAC83 \uB098) \uC9C1\uC0AC\uAD11\uC120\uC744 \uD53C\uD574\uC11C \uBCF4\uAD00\uD560 \uAC83. 4. \uB208\uC5D0 \uB4E4\uC5B4\uAC14\uC744 \uB54C\uC5D0\uB294 \uC989\uC2DC \uC53B\uC5B4\uB0BC \uAC83. 5. \uC0AC\uC6A9 \uD6C4 \uBB3C\uB85C \uC53B\uC5B4\uB0B4\uC9C0 \uC54A\uC73C\uBA74 \uD0C8\uBAA8 \uB610\uB294 \uD0C8\uC0C9\uC758 \uC6D0\uC778\uC774 \uB420 \uC218 \uC788\uC73C\uBBC0\uB85C \uC8FC\uC758\uD560 \uAC83. \u203B \uBCF8 \uC81C\uD488\uC740 \uC6A9\uB3C4 \uC774\uC678\uC5D0\uB294 \uC0AC\uC6A9\uD558\uC9C0 \uB9C8\uC2ED\uC2DC\uC624. \uC2DC\uAC04\uC774 \uACBD\uACFC\uD558\uBA74\uC11C \uB0B4\uC6A9\uBB3C\uC774 \uBCC0\uC0C9\uB420 \uC218 \uC788\uC73C\uB098 \uC81C\uD488\uC758 \uD488\uC9C8\uC5D0\uB294 \uC774\uC0C1\uC774 \uC5C6\uC2B5\uB2C8\uB2E4. \uBCF8 \uC81C\uD488\uC740 \uACF5\uC815\uAC70\uB798\uC704\uC6D0\uD68C \uACE0\uC2DC\uC5D0 \uC758\uAC70 \uAD50\uD658 \uB610\uB294 \uBCF4\uC0C1\uBC1B\uC744 \uC218 \uC788\uC2B5\uB2C8\uB2E4. \uAE30\uB2A5\uC131\uD654\uC7A5\uD488: \uC9C8\uBCD1\uC758 \uC608\uBC29 \uBC0F \uCE58\uB8CC\uB97C \uC704\uD55C \uC758\uC57D\uD488\uC774 \uC544\uB2D8."
+        },
+        manufacturer: "\u321C\uC5D8\uC9C0\uC0DD\uD65C\uAC74\uAC15 / \uACF5\uC7A5: \uCDA9\uCCAD\uBD81\uB3C4 \uCCAD\uC8FC\uC2DC \uD765\uB355\uAD6C 2\uC21C\uD658\uB85C 765, \uBCF8\uC0AC: \uC11C\uC6B8\uC2DC \uC911\uAD6C \uD6C4\uC554\uB85C 98 / MADE IN KOREA",
+        customerService: "\uC81C\uD488\uC0C1\uB2F4\xB7\uD488\uC9C8\uBD88\uD3B8 080-023-7007 (\uC218\uC2E0\uC790 \uBD80\uB2F4, \uD3C9\uC77C 09:00~17:30), \uC8FC\uBB38\xB7\uCDE8\uC18C\xB7\uBC30\uC1A1 080-858-9685 (\uD3C9\uC77C 09:00~18:00), www.DrGroot.co.kr",
+        featureSet: {
+          _path: "/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/features",
+          featureTitles: [
+            "\uB450\uD53C\uC5D0 \uBC14\uB974\uB294 \uBFCC\uB9AC \uBCFC\uB968\uD329",
+            "\uB450\uD53C \uAC01\uC9C8\xB7\uC720\uBD84 \uCF00\uC5B4",
+            "\uB450\uD53C \uC7A5\uBCBD \uCF00\uC5B4",
+            "\uBFCC\uB9AC \uBCFC\uB968 \uD2B9\uD5C8 \uC131\uBD84",
+            "\uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131",
+            "\uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00 \uC800\uC790\uADF9 \uB370\uC77C\uB9AC \uD329",
+            "\uD758\uB7EC\uB0B4\uB9AC\uC9C0 \uC54A\uB294 \uC81C\uD615\uACFC \uD50C\uB85C\uB7F4 \uD5A5"
+          ],
+          featureSummaries: [
             {
-              name: "\uB9AC\uC5D4 \uB2E5\uD130\uADF8\uB8E8\uD2B8 \uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uC0F4\uD478",
-              alternateName: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 \uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uB450\uD53C\uAC15\uD654 \uCEA1\uC290\uC0F4\uD478 [\uBAA8\uB4E0 \uB450\uD53C\uC6A9]",
-              brand: {
-                name: "\uB2E5\uD130\uADF8\uB8E8\uD2B8"
-              },
-              gtin13: "8809949559837",
-              description: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 \uB9C8\uC774\uD06C\uB85C\uBC14\uC774\uC634 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uC0F4\uD478\uB294 \uBC14\uC774\uC624\uC5D1\uC18C\uC880\u2122 \uCF64\uD50C\uB809\uC2A4\uC640 \uC720\uC0B0\uADE0 \uBC1C\uD6A8 \uC131\uBD84\uC73C\uB85C \uC57D\uD574\uC9C4 \uB450\uD53C \uC7A5\uBCBD\uC744 \uAD00\uB9AC\uD558\uB294 \uB450\uD53C \uADFC\uBCF8 \uCF00\uC5B4 \uC0F4\uD478\uC774\uBA70, \uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4.",
-              manufacturer: {
-                name: "\u321C\uC5D8\uC9C0\uC0DD\uD65C\uAC74\uAC15"
-              },
-              additionalProperty: [
-                {
-                  name: "\uC6A9\uB7C9",
-                  value: "400ml"
-                },
-                {
-                  name: "\uAE30\uB2A5\uC131",
-                  value: "\uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654"
-                },
-                {
-                  name: "pH",
-                  value: "\uC57D\uC0B0\uC131"
-                },
-                {
-                  name: "\uD5A5",
-                  value: "\uD5C8\uBC8C \uC2DC\uD2B8\uB7EC\uC2A4"
-                }
-              ]
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 \uBAA8\uBC1C \uB05D\uC774 \uC544\uB2CC \uB450\uD53C\uC640 \uBFCC\uB9AC\uBD80\uD130 \uBC14\uB974\uB294 \uC2A4\uCE7C\uD504 & \uD5E4\uC5B4 \uD329\uC785\uB2C8\uB2E4."
             },
             {
-              mainEntity: [
-                {
-                  name: "\uB2E5\uD130\uADF8\uB8E8\uD2B8 \uBC14\uC774\uC624\uC5D1\uC18C\uC880 \uC0F4\uD478\uB294 \uD0C8\uBAA8 \uAE30\uB2A5\uC131 \uC81C\uD488\uC778\uAC00\uC694?",
-                  acceptedAnswer: {
-                    text: "\uB124, \uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4. \uC2DD\uC57D\uCC98 \uC2EC\uC0AC(\uB610\uB294 \uBCF4\uACE0)\uB97C \uAC70\uCCE4\uC2B5\uB2C8\uB2E4."
-                  }
-                },
-                {
-                  name: "\uC0AC\uC6A9\uAE30\uD55C\uC740 \uC5BC\uB9C8\uB098 \uB418\uB098\uC694?",
-                  acceptedAnswer: {
-                    text: "\uAC1C\uBD09 \uD6C4 12\uAC1C\uC6D4\uC785\uB2C8\uB2E4. \uC81C\uC870\uC77C\uB85C\uBD80\uD130 36\uAC1C\uC6D4 \uC774\uB0B4 \uC81C\uD488\uB9CC \uD310\uB9E4\uD569\uB2C8\uB2E4."
-                  }
-                }
-              ]
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC758 \uBC00\uCC29 \uC81C\uD615\uC740 \uB450\uD53C\uC758 \uBB35\uC740 \uAC01\uC9C8, \uB178\uD3D0\uBB3C, \uC720\uBD84\uC744 \uD761\uCC29\uD569\uB2C8\uB2E4. \uC778\uCCB4\uC801\uC6A9\uC2DC\uD5D8\uC5D0\uC11C \uC0AC\uC6A9 \uC9C1\uD6C4 \uB450\uD53C \uAC01\uC9C8 94.7%, \uB450\uD53C \uD53C\uC9C0 95.4% \uAC1C\uC120\uC774 \uD655\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+            },
+            {
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 PDRN(\uC18C\uB4D0\uB514\uC5D4\uC5D0\uC774), \uB85C\uC988\uB9C8\uB9AC\uC78E\uC624\uC77C, \uBCD1\uD480\uC78E\uCD94\uCD9C\uBB3C(\uC13C\uD154\uB77C)\uC774 \uD568\uC720\uB41C \uC81C\uD615\uC73C\uB85C \uB450\uD53C \uC7A5\uBCBD\uC744 \uCF00\uC5B4\uD569\uB2C8\uB2E4."
+            },
+            {
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC5D0\uB294 \uBFCC\uB9AC \uBCFC\uB968 \uD2B9\uD5C8 \uC131\uBD84(\uD2B9\uD5C8 \uC81C10-2505580\uD638)\uC774 \uB4E4\uC5B4 \uC788\uC73C\uBA70, \uC778\uBAA8 \uAC00\uBC1C \uC2DC\uD5D8\uC5D0\uC11C 1\uD68C \uC0AC\uC6A9 \uD6C4 24\uC2DC\uAC04 \uBFCC\uB9AC \uBCFC\uB968 \uC9C0\uC18D\uC774 \uD655\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
+            },
+            {
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 \uD0C8\uBAA8 \uC99D\uC0C1\uC758 \uC644\uD654\uC5D0 \uB3C4\uC6C0\uC744 \uC8FC\uB294 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4. \uC778\uCCB4\uC801\uC6A9\uC2DC\uD5D8\uC5D0\uC11C 2\uC8FC \uC0AC\uC6A9 \uD6C4 \uBE57\uC9C8(\uB04A\uC5B4\uC9D0)\uC5D0 \uC758\uD55C \uD0C8\uB77D \uBAA8\uBC1C \uC218\uAC00 74.3% \uAC10\uC18C\uD588\uC2B5\uB2C8\uB2E4."
+            },
+            {
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 \uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00 \uC81C\uD615\uC774\uBA70, 48\uC2DC\uAC04 \uCCA9\uD3EC\uC2DC\uD5D8\uC5D0\uC11C \uC720\uC758\uD55C \uC218\uC900\uC758 \uD53C\uBD80\uC790\uADF9\uC774 \uC5C6\uC5C8\uC2B5\uB2C8\uB2E4."
+            },
+            {
+              plaintext: "\uC774 \uD5E4\uC5B4\uD329\uC740 \uD758\uB7EC\uB0B4\uB9AC\uC9C0 \uC54A\uB294 \uCAC0\uB4DD\uD55C \uC5D0\uC5B4\uB9AC \uC81C\uD615\uC774\uBA70, \uB85C\uC988\uC5D0\uC13C\uC2A4 \uD0D1\uB178\uD2B8\uC758 \uD50C\uB85C\uB7F4 \uD5A5\uC785\uB2C8\uB2E4."
             }
+          ],
+          featureTypes: [
+            "usage",
+            "benefit",
+            "benefit",
+            "ingredient",
+            "functional",
+            "safety",
+            "texture"
+          ],
+          marketingCopy: [
+            "\uBFCC\uB9AC\uBD80\uD130 \uCAC0\uB4DD\uD558\uAC8C \uC0B4\uC544\uB098\uB294 \uBCFC\uB968 \uC790\uC2E0\uAC10",
+            "\uC2A4\uD30C\uC5D0 \uB2E4\uB140\uC628 \uB4EF \uAC1C\uC6B4\uD558\uAC8C",
+            "\uB2FF\uC544\uB3C4 OK, \uBD80\uB2F4 ZERO",
+            "3\uBD84, \uC790\uC720\uB85C\uC6CC\uC9C0\uC138\uC694",
+            "\uB450\uD53C\uAE4C\uC9C0 \uCF00\uC5B4\uD558\uB294 \uD5E4\uC5B4\uD329\uC73C\uB85C \uBCFC\uB968\uC758 \uAE30\uC900\uC744 \uBC14\uAFD4\uBCF4\uC138\uC694",
+            "\uC7AC\uAD6C\uB9E4\uC728 1\uC704 (\uADFC\uAC70 \uBBF8\uC81C\uC2DC)",
+            "\uD0C8\uBAA8\uC99D\uC0C1 \uCF00\uC5B4 \uC804\uBB38",
+            "\uCAC0\uB4DD \uBC00\uCC29 X \uCAC0\uCAC0 \uD38C\uD551"
           ]
-        }
+        },
+        claimSet: {
+          _path: "/content/dam/drgroot/products/ko/pdrn-volume-scalp-hair-pack/claims",
+          statements: [
+            "\uBFCC\uB9AC \uBCFC\uB968 \uC9C0\uC18D",
+            "\uBFCC\uB9AC \uBCFC\uB968 \uC99D\uAC00",
+            "\uB450\uD53C \uAC01\uC9C8 \uAC1C\uC120",
+            "\uB450\uD53C \uD53C\uC9C0 \uAC1C\uC120",
+            "\uBE57\uC9C8(\uB04A\uC5B4\uC9D0)\uC5D0 \uC758\uD55C \uD0C8\uB77D \uBAA8\uBC1C \uC218 \uAC10\uC18C",
+            "\uB450\uD53C \uC7A5\uBCBD \uAC1C\uC120\xB7\uAC15\uD654",
+            "\uBAA8\uACF5 \uAC01\uC9C8 \uD761\uCC29",
+            "\uD53C\uBD80 \uC790\uADF9 \uD14C\uC2A4\uD2B8 \uC644\uB8CC",
+            "\uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00"
+          ],
+          claimValues: [
+            "24\uC2DC\uAC04",
+            "15.7%",
+            "94.7%",
+            "95.4%",
+            "74.3%",
+            "-",
+            "-",
+            "\uC720\uC758\uD55C \uD53C\uBD80\uC790\uADF9 \uC5C6\uC74C",
+            "-"
+          ],
+          conditions: [
+            "1\uD68C \uC0AC\uC6A9 (\uC778\uBAA8 \uAC00\uBC1C \uC2DC\uD5D8)",
+            "\uC0AC\uC6A9 \uC9C1\uD6C4 (\uC778\uBAA8 \uAC00\uBC1C \uC2DC\uD5D8)",
+            "\uC0AC\uC6A9 \uC9C1\uD6C4",
+            "\uC0AC\uC6A9 \uC9C1\uD6C4",
+            "\uC0AC\uC6A9 2\uC8FC \uD6C4",
+            "-",
+            "-",
+            "\uB4F1 \uBD80\uC704, 48\uC2DC\uAC04 \uD3D0\uC1C4\uD615 \uCCA9\uD3EC\uC2DC\uD5D8, \uAC1C\uC778\uCC28 \uC788\uC74C",
+            "-"
+          ],
+          footnotes: [
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC778\uBAA8 \uAC00\uBC1C 30\uAC1C, \uC2DC\uD5D8\uAE30\uAC04 2026.03.03~2026.03.04"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC778\uBAA8 \uAC00\uBC1C 30\uAC1C, \uC2DC\uD5D8\uAE30\uAC04 2026.03.03~2026.03.04"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC5EC\uC131 30\uBA85, \uC2DC\uD5D8\uAE30\uAC04 2026.03.09~2026.03.26"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC5EC\uC131 30\uBA85, \uC2DC\uD5D8\uAE30\uAC04 2026.03.09~2026.03.26"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC5EC\uC131 30\uBA85, \uC2DC\uD5D8\uAE30\uAC04 2026.03.09~2026.03.26"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC5EC\uC131 30\uBA85, \uC2DC\uD5D8\uAE30\uAC04 2026.03.09~2026.03.26"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D8\uB9AC\uB4DC, \uC5EC\uC131 30\uBA85, \uC2DC\uD5D8\uAE30\uAC04 2026.03.09~2026.03.26"
+            },
+            {
+              plaintext: "(\uC8FC)\uC5D0\uCF54\uB364, \uC2DC\uD5D8\uC778\uC6D0 30\uBA85, 2026.02.02~2026.02.06"
+            },
+            {
+              plaintext: "\uCC98\uBC29 \uD45C\uAE30 (\uC804\uC131\uBD84\uC0C1 \uC2E4\uB9AC\uCF58 \uACC4\uC5F4 \uC131\uBD84 \uC5C6\uC74C \u2014 \uAC80\uC218 \uD655\uC778 \uD544\uC694)"
+            }
+          ],
+          evidenceTypes: [
+            "in-vitro-test (\uC778\uBAA8 \uAC00\uBC1C)",
+            "in-vitro-test (\uC778\uBAA8 \uAC00\uBC1C)",
+            "human-application-test",
+            "human-application-test",
+            "human-application-test",
+            "human-application-test",
+            "human-application-test",
+            "patch-test",
+            "formulation"
+          ]
+        },
+        jsonldtext: [
+          {
+            plaintext: '{"@context":"https://schema.org","@graph":[{"@type":"ProductGroup","name":"\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329","alternateName":["PDRN \uBCFC\uB968 \uB450\uD53C \uD5E4\uC5B4\uD329","Dr.Groot Hair & Scalp Volume Mask","PDRN\u207A Volume Boosting Scalp & Hair Mask"],"brand":{"@type":"Brand","name":"\uB2E5\uD130\uADF8\uB8E8\uD2B8"},"manufacturer":{"@type":"Organization","name":"\u321C\uC5D8\uC9C0\uC0DD\uD65C\uAC74\uAC15"},"description":"\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uBAA8\uBC1C \uB05D\uC774 \uC544\uB2CC \uB450\uD53C\uC640 \uBAA8\uBC1C \uBFCC\uB9AC\uC5D0 \uBC14\uB974\uB294 180ml \uB450\uD53C \uC804\uC6A9 \uBCFC\uB968 \uD5E4\uC5B4\uD329\uC774\uBA70, \uD0C8\uBAA8 \uC99D\uC0C1 \uC644\uD654 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4.","variesBy":"https://schema.org/size","additionalProperty":[{"@type":"PropertyValue","name":"\uAE30\uB2A5\uC131","value":"\uD0C8\uBAA8 \uC99D\uC0C1\uC758 \uC644\uD654\uC5D0 \uB3C4\uC6C0"},{"@type":"PropertyValue","name":"\uBB34\uCCA8\uAC00","value":"\uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00"},{"@type":"PropertyValue","name":"\uD5A5","value":"\uD50C\uB85C\uB7F4"}],"hasVariant":[{"@type":"Product","name":"PDRN \uBCFC\uB968 \uB450\uD53C \uD5E4\uC5B4\uD329 180ml","size":"180ml","gtin13":"8800335743281","productID":"1218","url":"https://drgroot.co.kr/product/pdrn-\uBCFC\uB968-\uB450\uD53C-\uD5E4\uC5B4\uD329/1218/"}]},{"@type":"HowTo","name":"PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329 \uC0AC\uC6A9\uBC95","step":[{"@type":"HowToStep","position":1,"text":"\uC0F4\uD478 \uD6C4 \uC628\uC218\uB85C \uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uCDA9\uBD84\uD788 \uC801\uC2ED\uB2C8\uB2E4."},{"@type":"HowToStep","position":2,"text":"\uC801\uB2F9\uB7C9\uC744 \uBAA8\uBC1C\uACFC \uB450\uD53C\uC5D0 \uACE8\uACE0\uB8E8 \uBC14\uB985\uB2C8\uB2E4."},{"@type":"HowToStep","position":3,"text":"\uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uB9C8\uC0AC\uC9C0\uD569\uB2C8\uB2E4."},{"@type":"HowToStep","position":4,"text":"\uBB3C\uB85C \uAE68\uB057\uC774 \uD5F9\uAD7D\uB2C8\uB2E4."}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"\uB2E5\uD130\uADF8\uB8E8\uD2B8 PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC778\uAC00\uC694?","acceptedAnswer":{"@type":"Answer","text":"\uB124, \uD0C8\uBAA8 \uC99D\uC0C1\uC758 \uC644\uD654\uC5D0 \uB3C4\uC6C0\uC744 \uC8FC\uB294 \uAE30\uB2A5\uC131 \uD654\uC7A5\uD488\uC785\uB2C8\uB2E4. \uC9C8\uBCD1\uC758 \uC608\uBC29\uC774\uB098 \uCE58\uB8CC\uB97C \uC704\uD55C \uC758\uC57D\uD488\uC740 \uC544\uB2D9\uB2C8\uB2E4."}},{"@type":"Question","name":"PDRN\u207A \uD5E4\uC5B4\uC5D4 \uC2A4\uCE7C\uD504 \uBCFC\uB968\uD329\uC740 \uC5B4\uB5BB\uAC8C \uC0AC\uC6A9\uD558\uB098\uC694?","acceptedAnswer":{"@type":"Answer","text":"\uC0F4\uD478 \uD6C4 \uC628\uC218\uB85C \uBAA8\uBC1C\uACFC \uB450\uD53C\uB97C \uCDA9\uBD84\uD788 \uC801\uC2DC\uACE0, \uC801\uB2F9\uB7C9\uC744 \uBAA8\uBC1C\uACFC \uB450\uD53C\uC5D0 \uACE8\uACE0\uB8E8 \uBC14\uB978 \uB4A4 \uB9C8\uC0AC\uC9C0\uD558\uACE0 \uBB3C\uB85C \uAE68\uB057\uC774 \uD5F9\uAD7D\uB2C8\uB2E4."}},{"@type":"Question","name":"\uC774 \uD5E4\uC5B4\uD329\uC5D0 \uC2E4\uB9AC\uCF58\uC774 \uB4E4\uC5B4 \uC788\uB098\uC694?","acceptedAnswer":{"@type":"Answer","text":"\uC2E4\uB9AC\uCF58 \uBB34\uCCA8\uAC00 \uC81C\uD615\uC785\uB2C8\uB2E4."}},{"@type":"Question","name":"\uC5B4\uB5A4 \uACE0\uBBFC\uC774 \uC788\uC744 \uB54C \uC4F0\uBA74 \uC88B\uC740\uAC00\uC694?","acceptedAnswer":{"@type":"Answer","text":"\uBFCC\uB9AC \uBCFC\uB968\uC774 \uC27D\uAC8C \uAC00\uB77C\uC549\uAC70\uB098, \uB450\uD53C\uAC00 \uAC1C\uC6B4\uD558\uC9C0 \uC54A\uAC70\uB098, \uBAA8\uBC1C \uB05D\uC5D0\uB9CC \uC4F0\uB294 \uD329\uC73C\uB85C\uB294 \uBFCC\uB9AC \uBCFC\uB968\uC774 \uC720\uC9C0\uB418\uC9C0 \uC54A\uC744 \uB54C \uC4F0\uB294 \uB450\uD53C \uC804\uC6A9 \uBCFC\uB968\uD329\uC785\uB2C8\uB2E4."}},{"@type":"Question","name":"\uC5B4\uB5A4 \uD5A5\uC778\uAC00\uC694?","acceptedAnswer":{"@type":"Answer","text":"\uB85C\uC988\uC5D0\uC13C\uC2A4\uC640 \uADF8\uB9B0 \uC544\uC774\uBE44(top), \uBE14\uB799\uCEE4\uB7F0\uD2B8 \uC2F9\uACFC \uBAA8\uC2A4(middle), \uC0CC\uB2EC\uC6B0\uB4DC\uC640 \uD1B5\uCE74\uBE48(base)\uC73C\uB85C \uAD6C\uC131\uB41C \uD50C\uB85C\uB7F4 \uD5A5\uC785\uB2C8\uB2E4."}},{"@type":"Question","name":"\uC6A9\uB7C9\uC740 \uC5BC\uB9C8\uC778\uAC00\uC694?","acceptedAnswer":{"@type":"Answer","text":"180ml(6.5 fl oz)\uC785\uB2C8\uB2E4."}}]}]}'
+          }
+        ],
+        verified: false,
+        lastVerified: "2026-10-05"
       }
     }
   };
@@ -1176,7 +1374,7 @@ var CustomImportScript = (() => {
     transform3
   ];
   function executeTransformers(hookName, element, payload) {
-    const enhancedPayload = __spreadProps(__spreadValues({}, payload), { template: PAGE_TEMPLATE, productData: product_info_default });
+    const enhancedPayload = { ...payload, template: PAGE_TEMPLATE, productData: product_info_default };
     transformers.forEach((transformerFn) => {
       try {
         transformerFn.call(null, hookName, element, enhancedPayload);

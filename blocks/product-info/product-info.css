@@ -125,6 +125,23 @@
   list-style: none;
 }
 
+/* features / claims: title line above its text */
+.product-info .product-info-features .product-info-item-body ul,
+.product-info .product-info-claims .product-info-item-body ul {
+  padding-left: 0;
+  list-style: none;
+}
+
+.product-info .product-info-features li + li,
+.product-info .product-info-claims li + li {
+  margin-top: 12px;
+}
+
+.product-info .product-info-features li strong,
+.product-info .product-info-claims li strong {
+  display: block;
+}
+
 .product-info .product-info-specs strong {
   display: inline-block;
   min-width: 72px;

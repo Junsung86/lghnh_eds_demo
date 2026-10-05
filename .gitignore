@@ -8,6 +8,11 @@ helix-importer-ui
 *.bak
 .idea
 
+# App Builder (tools/product-sync): secrets and build output
+.env
+.aio
+dist/*
+
 # Ensure these files are tracked
 !CLAUDE.md
 !AGENTS.md

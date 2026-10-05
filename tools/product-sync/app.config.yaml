@@ -1,0 +1,25 @@
+application:
+  runtimeManifest:
+    packages:
+      product-sync:
+        license: Apache-2.0
+        actions:
+          sync:
+            function: actions/sync/index.js
+            # non-web: only I/O Events (registered as "Runtime action") and aio can invoke it
+            web: 'no'
+            runtime: nodejs:22
+            limits:
+              timeout: 120000
+            inputs:
+              GRAPHQL_BASE: https://publish-p166217-e1771263.adobeaemcloud.com/graphql/execute.json/ref-demo-eds
+              DA_ORG: junsung86
+              DA_REPO: lghnh-eds-demo
+              HLX_REF: main
+              EVENT_NAMES: published
+              IMS_CLIENT_ID: $IMS_CLIENT_ID
+              IMS_CLIENT_SECRET: $IMS_CLIENT_SECRET
+              IMS_SCOPES: $IMS_SCOPES
+              HLX_ADMIN_API_KEY: $HLX_ADMIN_API_KEY
+            annotations:
+              final: true
